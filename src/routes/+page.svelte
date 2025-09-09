@@ -282,6 +282,7 @@
         .container {
             flex-direction: column-reverse;
             width: 100vw;
+            height: 100%;
             padding: 24px;
             gap: 0;
             box-sizing: border-box;
