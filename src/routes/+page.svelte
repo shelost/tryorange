@@ -216,7 +216,7 @@
 </script>
 
 <svelte:head>
-    <title>Dots</title>
+    <title>Orange</title>
     <link rel="icon" href="/orange-gradient.png" />
 </svelte:head>
 
