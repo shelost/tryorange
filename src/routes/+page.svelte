@@ -235,7 +235,7 @@
 
         </p>
         <form on:submit|preventDefault={joinWaitlist}>
-            <input type="email" bind:value={email} placeholder="Enter your email" required />
+            <input type="email" bind:value={email} placeholder="your@email.com" required />
             <button type="submit">Join Waitlist</button>
           </form>
     </div>
@@ -243,15 +243,14 @@
 </div>
 
 <style lang="scss">
+    
 	:global(body) {
 		margin: 0;
 		padding: 0;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family: 'Lora', serif;
         background: white;
 	}
-
-  
 
 	.container {
 		display: flex;
@@ -267,9 +266,55 @@
             p{
                 font-family: 'Lora', serif;
                 font-size: 14px;
+                letter-spacing: -0.25px;
             }
         }
 	}
+
+    form{
+        margin-top: 24px;
+        display: flex;
+        gap: 18px;
+        input{
+            outline: none;
+            border: none;
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
+            line-cap: round;
+            padding: 4px 0px;
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            font-weight: 450;
+            letter-spacing: -0.25px;
+            width: 240px;
+            transition: all 0.3s ease;
+
+            &::placeholder{
+                color: rgba(0, 0, 0, 0.3);
+            }
+
+            &:focus{
+                border-bottom: 1.5px solid rgb(255, 98, 0);
+            }
+        }
+        button{
+            background: rgb(255, 98, 0);
+            color: white;
+            border: none;
+            padding: 8px 18px 8.5px 18px;
+            border-radius: 40px;
+            font-family: 'Lora', serif;
+            font-size: 15px;
+            font-weight: 450;
+            letter-spacing: -0.25px;
+            box-shadow: -4px 4px 10px 0 rgba(255, 98, 0, 0.25);
+            transition: 0.2s ease;
+           
+            &:hover{
+                background: rgb(255, 81, 0);
+                cursor: pointer;
+            }
+        }
+    }
 
 	canvas {
         width: 480px !important;
@@ -287,11 +332,28 @@
             gap: 0;
             box-sizing: border-box;
             canvas{
-                width: 100vw !important;
-                height: 100vw !important;
+                width: 90vw !important;
+                height: 90vw !important;
             }
             .mast{
                 width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            input{
+                width: 98%;
+            }
+            button{
+                width: 100%;
+                padding: 14px;
             }
         }
     }
