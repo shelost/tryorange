@@ -393,7 +393,7 @@
 				on:mouseenter={() => isButtonHovered = true}
 				on:mouseleave={() => isButtonHovered = false}
 				disabled={isSubmitting}
-			>{isSubmitting ? 'Submitting...' : 'Join Waitlist'}</button>
+			>{isSubmitting ? 'Adding...' : 'Join Waitlist'}</button>
           </form>
     </div>
 	<canvas bind:this={canvas}></canvas>
