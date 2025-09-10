@@ -111,6 +111,7 @@
 	let profileChangeTimer = 0;
 	const profileChangeDuration = 2500; 
 	let profiles = [];
+	let emailInput;
 
 	function initializeDots() {
 		dots = [];
@@ -284,6 +285,18 @@
 		};
 		window.addEventListener('touchstart', handleFirstTouch, { once: true });
 		
+		const handleViewportResize = () => {
+			if (document.activeElement === emailInput) {
+				setTimeout(() => {
+					emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}, 150);
+			}
+		};
+		
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener('resize', handleViewportResize);
+		}
+		
 		const handleMouseMove = (event) => {
 			if (isTouchDevice) return;
 			const rect = canvas.getBoundingClientRect();
@@ -346,6 +359,9 @@
 			window.removeEventListener('keydown', handleKeyDown);
 			window.removeEventListener('touchstart', handleFirstTouch);
 			canvas.removeEventListener('click', handleCanvasClick);
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener('resize', handleViewportResize);
+			}
 		};
 	});
 </script>
@@ -375,6 +391,7 @@
 				bind:value={email}
 				placeholder="your@email.com"
 				required
+				bind:this={emailInput}
 				on:mouseenter={() => { if (!isTouchDevice) isInputHovered = true; }}
 				on:mouseleave={() => { if (!isTouchDevice) isInputHovered = false; }}
 			/>
@@ -416,7 +433,7 @@
 		align-items: center;
         gap: 48px;
 		width: 100vw;
-		height: 100vh;
+		height: 100dvh;
 		position: relative;
         background: white;
         .mast{
