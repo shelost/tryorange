@@ -522,6 +522,9 @@
                 width: 100%;
                 box-sizing: border-box;
             }
+			.interaction-canvas {
+				display: none;
+			}
         }
 
         form{
