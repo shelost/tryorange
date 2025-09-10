@@ -289,7 +289,7 @@
 			if (document.activeElement === emailInput) {
 				setTimeout(() => {
 					emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				}, 150);
+				}, 20);
 			}
 		};
 		
