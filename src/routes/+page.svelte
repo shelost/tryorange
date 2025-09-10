@@ -104,6 +104,10 @@
 	let currentColorIndex = 0;
 	$: currentTheme = colorProfiles[currentColorIndex];
 	let currentProfileIndex = 0;
+	let isTouchDevice = false;
+	$: if (isTouchDevice && typeof document !== 'undefined') {
+		document.body.classList.add('touch-device');
+	}
 	let profileChangeTimer = 0;
 	const profileChangeDuration = 2500; 
 	let profiles = [];
@@ -275,6 +279,12 @@
 		ctx = canvas.getContext('2d');
 		interactionCtx = interactionCanvas.getContext('2d');
 		
+		const handleFirstTouch = () => {
+			isTouchDevice = true;
+			window.removeEventListener('touchstart', handleFirstTouch);
+		};
+		window.addEventListener('touchstart', handleFirstTouch, { once: true });
+		
 		// --- Mobile keyboard handling ---
 		if ('virtualKeyboard' in navigator) {
 			navigator.virtualKeyboard.overlaysContent = true;
@@ -294,6 +304,7 @@
 		// --- End mobile keyboard handling ---
 
 		const handleMouseMove = (event) => {
+			if (isTouchDevice) return;
 			const rect = canvas.getBoundingClientRect();
 			mouse.x = event.clientX - rect.left;
 			mouse.y = event.clientY - rect.top;
@@ -302,6 +313,7 @@
 		};
 
 		const handleMouseLeave = () => {
+			if (isTouchDevice) return;
 			mouse.x = undefined;
 			mouse.y = undefined;
 			mouse.clientX = undefined;
@@ -351,6 +363,7 @@
 			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseleave', handleMouseLeave);
 			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('touchstart', handleFirstTouch);
 			canvas.removeEventListener('click', handleCanvasClick);
 			if (window.visualViewport) {
 				window.visualViewport.removeEventListener('resize', handleViewportResize);
@@ -385,13 +398,13 @@
 				placeholder="your@email.com"
 				required
 				bind:this={emailInput}
-				on:mouseenter={() => isInputHovered = true}
-				on:mouseleave={() => isInputHovered = false}
+				on:mouseenter={() => { if (!isTouchDevice) isInputHovered = true; }}
+				on:mouseleave={() => { if (!isTouchDevice) isInputHovered = false; }}
 			/>
             <button
 				type="submit"
-				on:mouseenter={() => isButtonHovered = true}
-				on:mouseleave={() => isButtonHovered = false}
+				on:mouseenter={() => { if (!isTouchDevice) isButtonHovered = true; }}
+				on:mouseleave={() => { if (!isTouchDevice) isButtonHovered = false; }}
 				disabled={isSubmitting}
 			>{isSubmitting ? 'Adding...' : 'Join Waitlist'}</button>
           </form>
@@ -410,6 +423,10 @@
         background: white;
 		cursor: none;
     }
+
+	:global(body.touch-device) {
+		cursor: auto;
+	}
 
 	::selection{
 		background: rgb(255, 98, 0);
