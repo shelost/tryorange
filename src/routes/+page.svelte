@@ -300,8 +300,13 @@
 		const handleMouseMove = (event) => {
 			if (isTouchDevice) return;
 			const rect = canvas.getBoundingClientRect();
-			mouse.x = event.clientX - rect.left;
-			mouse.y = event.clientY - rect.top;
+			
+			// Translate mouse coordinates from screen space to canvas space
+			const scaleX = canvas.width / (rect.width * 2); // 2 is scaleFactor
+			const scaleY = canvas.height / (rect.height * 2);
+
+			mouse.x = (event.clientX - rect.left) * scaleX;
+			mouse.y = (event.clientY - rect.top) * scaleY;
 			mouse.clientX = event.clientX;
 			mouse.clientY = event.clientY;
 		};
