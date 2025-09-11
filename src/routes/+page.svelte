@@ -186,10 +186,10 @@
 		});
 
 		if (isInputHovered) {
-			cursorShape.set({ rx: 0.1, ry: 10, lineWidth: 5 });
+			cursorShape.set({ rx: 0.1, ry: 10, lineWidth: 3 });
 		} else {
-			const radius = isRepelling ? 20 : 10;
-			cursorShape.set({ rx: radius, ry: radius, lineWidth: 5 });
+			const radius = isRepelling ? 16 : 8;
+			cursorShape.set({ rx: radius, ry: radius, lineWidth: 3 });
 		}
 
 		// Then draw everything with the final positions
@@ -301,8 +301,7 @@
 			if (isTouchDevice) return;
 			const rect = canvas.getBoundingClientRect();
 			
-			// Translate mouse coordinates from screen space to canvas space
-			const scaleX = canvas.width / (rect.width * 2); // 2 is scaleFactor
+			const scaleX = canvas.width / (rect.width * 2); 
 			const scaleY = canvas.height / (rect.height * 2);
 
 			mouse.x = (event.clientX - rect.left) * scaleX;
@@ -379,17 +378,24 @@
 <div class="container" style="--theme-color: {currentTheme.color}">
     <div class = 'mast'>
         <p>
-            Orange is built on a simple idea: who you are is found in what you do. Not in the boxes you check, but in the choices you make when the stakes are real.
-           <br> <br>
-            We believe personality isn’t a static label. It’s a living system, an unfolding story.
-
-            <br> <br>
-            
-            This is not a personality test. It is a series of small worlds, simulations designed to be played. The result is not a score, but a reflection.
-            <br> <br>
-             A new way to see the judgment, creativity and taste that makes you, you.
-
+			Who you are is found in what you do.
+			<br> <br>
+			Not in the boxes you check, but in the choices you make when the stakes are real.
+			<br> <br>
+			This is not a personality test. It is a series of small worlds, simulations designed to be played.
+			<br> <br>
+			A new way to uncover what makes you: you.
         </p>
+
+		<a href="https://tally.so/r/mR91yP" target="_blank">
+			<button
+				type="submit"
+				on:mouseenter={() => { if (!isTouchDevice) isButtonHovered = true; }}
+				on:mouseleave={() => { if (!isTouchDevice) isButtonHovered = false; }}
+			> Join Waitlist </button>
+		</a>
+		
+		<!--
         <form on:submit|preventDefault={joinWaitlist}>
             <input
 				type="email"
@@ -407,6 +413,7 @@
 				disabled={isSubmitting}
 			>{isSubmitting ? 'Adding...' : 'Join Waitlist'}</button>
           </form>
+		  -->
     </div>
 	<canvas bind:this={canvas}></canvas>
 </div>
@@ -487,7 +494,10 @@
                 border-bottom: 1.5px solid var(--theme-color);
             }
         }
-        button{
+       
+	}
+
+	button{
             background: var(--theme-color);
             color: white;
             border: none;
@@ -497,11 +507,10 @@
             font-size: 15px;
             font-weight: 450;
             letter-spacing: -0.25px;
-            box-shadow: -4px 4px 10px 0 color-mix(in srgb, var(--theme-color) 40%, transparent);
             transition: 0.2s ease;
+			margin: 24px 0;
            
             &:hover{
-                //background: color-mix(in srgb, var(--theme-color) 90%, black);
                 cursor: pointer;
 				cursor: none;
 				transform: scale(1.05);
@@ -511,7 +520,6 @@
 				cursor: not-allowed;
 			}
         }
-	}
 
 	canvas {
         width: 480px !important;
