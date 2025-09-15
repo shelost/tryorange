@@ -68,10 +68,7 @@
 	function selectAvatar(avatar) {
 		selectedAvatar = avatar;
 		localStorage.setItem('selectedAvatarId', avatar.id);
-		visibleAvatars = [avatar];
-		setTimeout(() => {
-			goToStep(3);
-		}, 150);
+		goToStep(3);
 	}
 </script>
 
@@ -150,11 +147,7 @@
 		</div>
 
 		{#if step === 3 && selectedAvatar}
-			<div
-				class="step-3-text"
-				in:fade={{ duration: 300, delay: 300 }}
-				out:fade={{ duration: 300 }}
-			>
+			<div class="step-3-text" class:visible={step === 3}>
 				<p class="greeting">
 					Yippee, you picked me — your Mote, your guide, I'll walk you through Miso, right by your
 					side.
@@ -181,9 +174,9 @@
 	/>
 </div>
 
-<style>
+<style lang="scss">
 	:global(body) {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+		font-family: 'Lora', Roboto, Oxygen, Ubuntu, Cantarell,
 			'Open Sans', 'Helvetica Neue', sans-serif;
 		background-color: #fdfdfd;
 		color: #333;
@@ -223,6 +216,7 @@
 		font-size: 2.5rem;
 		font-weight: 600;
 		margin-bottom: 3rem;
+        letter-spacing: -1.5px;
 	}
 
 	.form-section {
@@ -239,9 +233,11 @@
 
 	.image-container img {
 		max-width: 200px;
-		border-radius: 16px;
+		border-radius: 8px;
+        border: 3px solid white;
         background: white;
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        transform: rotate(-4deg);
+        box-shadow: -12px 24px 36px rgba(0,0,0, 0.1);
 	}
 
 	.image-container p {
@@ -340,6 +336,8 @@
 		cursor: pointer;
 		transition: transform 0.3s ease, box-shadow 0.3s ease;
 		border-radius: 50%;
+		width: 150px;
+		height: 150px;
 	}
 
 	.avatar:hover {
@@ -355,8 +353,8 @@
 	}
 
 	.avatar img {
-		width: 150px;
-		height: 150px;
+		width: 100%;
+		height: 100%;
 	}
 
 	/* Step 3 layout adjustments */
@@ -370,14 +368,21 @@
 		margin-top: 0;
 	}
 	
-	.step-2-3-container.step-3 .avatar img {
+	/* Enlarge the avatar button itself in step 3 so FLIP accounts for size */
+	.step-2-3-container.step-3 .avatar {
 		width: 200px;
 		height: 200px;
 	}
 
 	.step-3-text {
 		text-align: left;
-		max-width: 400px;
+	    width: 400px !important;
+		opacity: 0;
+		transition: opacity 0.3s ease 0.3s;
+	}
+
+	.step-3-text.visible {
+		opacity: 1;
 	}
 	
 	.step-3-text p {
