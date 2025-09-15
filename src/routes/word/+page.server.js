@@ -24,15 +24,19 @@ Rank them on the following 5 categories on a scale of 0-10, where 0 is very low 
 4.  Pragmatism/Concrete Thinking
 5.  Emotional Spontaneity
 
-Please provide the analysis in a structured format. First a paragraph of general analysis, then the scores. Be insightful but also responsible. Do not make medical diagnoses.
+Address the user in the second-person POV "you" in the analysis. Use appropriate bolding and emphasis on important points.
+
+Please provide the analysis as a JSON object with two properties:
+- "summary": A single paragraph of general analysis (no scores mentioned in the text)
+- "scores": An array of exactly 5 numbers (0-10) in the order listed above
+
+Be insightful but also responsible. Do not make medical diagnoses.
+
 Example output format:
-"Based on your responses, you appear to be a highly creative and spontaneous individual...
----
-**Creativity/Abstract Thinking:** 8/10
-**Optimism/Positivity:** 7/10
-**Anxiety/Neuroticism:** 3/10
-**Pragmatism/Concrete Thinking:** 4/10
-**Emotional Spontaneity:** 9/10"
+{
+  "summary": "Based on your responses, you appear to be a highly creative and spontaneous individual with a tendency toward abstract thinking. Your associations suggest an optimistic outlook and emotional openness.",
+  "scores": [8, 7, 3, 4, 9]
+}
 `;
 
             const chatCompletion = await groq.chat.completions.create({
@@ -51,9 +55,9 @@ Example output format:
 
             const analysis = chatCompletion.choices[0]?.message?.content || 'Could not generate analysis.';
 
-            const scores = parseScores(analysis);
+            const parsedAnalysis = parseAnalysisJson(analysis);
 
-            return { success: true, analysis, scores };
+            return { success: true, analysis: parsedAnalysis };
         } catch (error) {
             console.error('Error with Groq API:', error);
             return fail(500, { error: 'Failed to generate analysis due to a server error.' });
@@ -62,19 +66,24 @@ Example output format:
 };
 
 /**
- * Parses a string containing personality scores in the format "**Category:** X/10"
- * and returns an array of the scores.
- * @param {string} text The analysis text.
- * @returns {number[]} An array of 5 scores, or null if parsing fails.
+ * Parses JSON analysis response from the LLM
+ * @param {string} text The JSON response text
+ * @returns {object|null} Parsed analysis object or null if parsing fails
  */
-function parseScores(text) {
-    const scoreRegex = /\*\*(.*?):\*\* (\d{1,2})\/10/g;
-    const matches = text.matchAll(scoreRegex);
-    const scores = [];
-    for (const match of matches) {
-        if (match[2]) {
-            scores.push(parseInt(match[2], 10));
+function parseAnalysisJson(text) {
+    try {
+        // Try to extract JSON from the text (in case there's extra text around it)
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonText = jsonMatch ? jsonMatch[0] : text;
+        
+        const parsed = JSON.parse(jsonText);
+        
+        // Validate structure
+        if (parsed.summary && Array.isArray(parsed.scores) && parsed.scores.length === 5) {
+            return parsed;
         }
+    } catch (e) {
+        console.error('Failed to parse analysis JSON:', e);
     }
-    return scores.length === 5 ? scores : null;
+    return null;
 }
