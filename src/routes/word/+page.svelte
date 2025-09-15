@@ -285,6 +285,17 @@
     $: if (radarCanvas && analysisResult?.scores) {
         drawRadarChart(radarCanvas, analysisResult.scores);
     }
+
+    // Simple markdown parser for bold and italic text
+    function parseMarkdown(text) {
+        if (!text) return '';
+        // Replace **text** with <strong>text</strong> (bold)
+        // Replace *text* with <em>text</em> (italics)
+        // Process bold first to avoid conflicts with italic processing
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+?)\*/g, '<em>$1</em>');
+    }
 </script>
 
 <svelte:head>
@@ -391,7 +402,7 @@
             {/if}
             {#if analysisResult?.summary}
                 <div class="analysis-result" in:fade>
-                    <p>{analysisResult.summary}</p>
+                    <p>{@html parseMarkdown(analysisResult.summary)}</p>
                 </div>
             {/if}
         </div>

@@ -24,7 +24,7 @@ Rank them on the following 5 categories on a scale of 0-10, where 0 is very low 
 4.  Pragmatism/Concrete Thinking
 5.  Emotional Spontaneity
 
-Address the user in the second-person POV "you" in the analysis. Use appropriate bolding and emphasis on important points.
+Address the user in the second-person POV "you" in the analysis. Use appropriate bolding and emphasis on important points (at least 2 per analysis). Keep the language simple and straightforward and personal.
 
 Please provide the analysis as a JSON object with two properties:
 - "summary": A single paragraph of general analysis (no scores mentioned in the text)
