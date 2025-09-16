@@ -435,7 +435,7 @@
     }
 
     .exit-button {
-        position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+        position: fixed; right: 20px; top: 20px;
         padding: 10px 16px; border-radius: 999px; border: 0; background: #ef4444; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 </style>
