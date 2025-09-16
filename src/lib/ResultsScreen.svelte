@@ -1,5 +1,4 @@
 <script>
-    import { fade } from 'svelte/transition';
     import PentagonChart from './PentagonChart.svelte';
     
     export let title = 'Here are your results!';
@@ -21,17 +20,11 @@
     }
 </script>
 
-<section class="results" in:fade={{ duration: 150 }} out:fade={{ duration: 120 }}>
+<section class="results">
     <h2 class="title">{title}</h2>
     
     {#if gameType === 'block' && finalScore !== null}
         <div class="final-score">Final Score: {finalScore}</div>
-    {/if}
-
-    {#if analysisLoading}
-        <div class="loading" in:fade>
-            {gameType === 'word' ? 'Generating your analysis...' : 'Analyzing your gameplay...'}
-        </div>
     {/if}
 
     <div class="analysis-container">
@@ -43,7 +36,7 @@
         />
         
         {#if analysisResult?.summary}
-            <div class="analysis-result" in:fade>
+            <div class="analysis-result">
                 <p>{@html parseMarkdown(analysisResult.summary)}</p>
             </div>
         {:else if analysisLoading}
@@ -58,7 +51,7 @@
     </div>
 
     {#if analysisError}
-        <div class="analysis-error" in:fade>
+        <div class="analysis-error">
             <p>Sorry, there was an error generating your analysis: {analysisError}</p>
         </div>
     {/if}
@@ -95,8 +88,7 @@
         }
 
         .analysis-container {
-            display: grid;
-            grid-template-columns: auto 1fr;
+            display: flex;
             gap: 2rem;
             align-items: center;
 

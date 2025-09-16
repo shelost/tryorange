@@ -1,5 +1,4 @@
 <script>
-    import { fade } from 'svelte/transition';
     
     export let title = '';
     export let subtitle = '';
@@ -24,8 +23,8 @@
         instructions = [
             { 
                 pellets: [
-                    { color: 'green', text: '+2' },
-                    { color: 'red', text: '-1' },
+                    { color: 'green', text: '+3' },
+                    { color: 'red', text: '-2' },
                     { color: 'yellow', text: 'Random (-5 to +10)' }
                 ]
             },
@@ -34,7 +33,7 @@
     }
 </script>
 
-<section class="config" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}>
+<section class="config">
     <div class="mast">
         <h1 class="title">{title}</h1>
         <p class="hint">{subtitle}</p>

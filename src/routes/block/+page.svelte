@@ -60,8 +60,8 @@
 
     // Pellet types
     const PELLET_TYPES = {
-        GREEN: { color: '#22c55e', points: 2, radius: 18, displayText: '+2' },
-        RED: { color: '#ef4444', points: -1, radius: 16, displayText: '-1' },
+        GREEN: { color: '#22c55e', points: 3, radius: 18, displayText: '+3' },
+        RED: { color: '#ef4444', points: -2, radius: 16, displayText: '-2' },
         YELLOW: { color: '#eab308', points: () => Math.floor(Math.random() * 16) - 5, radius: 20, displayText: '?' }
     };
 
@@ -749,46 +749,52 @@
         <input type="hidden" name="gameData" value={resultsJson} />
     </form>
 
-    {#if !started && !finished}
-        <StartScreen
-            title="Block Catcher"
-            subtitle="Catch falling pellets with your paddle"
-            gameType="block"
-            bind:selectedDuration
-            onStart={startGame}
-        />
-    {/if}
+    <div class="game-container">
+        {#if !started && !finished}
+            <div in:fade={{ duration: 300, delay: 200 }} out:fade={{ duration: 200 }}>
+                <StartScreen
+                    title="Block Catcher"
+                    subtitle="Catch falling pellets with your paddle"
+                    gameType="block"
+                    bind:selectedDuration
+                    onStart={startGame}
+                />
+            </div>
+        {/if}
 
-    {#if started}
-        <canvas
-            bind:this={canvas}
-            class="game-canvas"
-            in:fade={{ duration: 150 }}
-            out:fade={{ duration: 120 }}
-        ></canvas>
-        <button class="exit-button" type="button" on:click={exitGame} aria-label="Exit game" in:scale={{ duration: 140 }}>
-            Exit
-        </button>
-    {/if}
+        {#if started}
+            <div class="canvas-container" in:fade={{ duration: 300, delay: 200 }} out:fade={{ duration: 200 }}>
+                <canvas
+                    bind:this={canvas}
+                    class="game-canvas"
+                ></canvas>
+                <button class="exit-button" type="button" on:click={exitGame} aria-label="Exit game" in:scale={{ duration: 140 }}>
+                    Exit
+                </button>
+            </div>
+        {/if}
 
-    {#if finished}
-        <ResultsScreen
-            title="Game Complete!"
-            gameType="block"
-            finalScore={score}
-            {analysisLoading}
-            {analysisResult}
-            {analysisError}
-            labels={radarLabels}
-            onComplete={() => {
-                finished = false;
-                analysisResult = null;
-                analysisError = null;
-                localStorage.removeItem(CACHE_KEY);
-            }}
-            onRestart={startGame}
-        />
-    {/if}
+        {#if finished}
+            <div in:fade={{ duration: 300, delay: 200 }} out:fade={{ duration: 200 }}>
+                <ResultsScreen
+                    title="Game Complete!"
+                    gameType="block"
+                    finalScore={score}
+                    {analysisLoading}
+                    {analysisResult}
+                    {analysisError}
+                    labels={radarLabels}
+                    onComplete={() => {
+                        finished = false;
+                        analysisResult = null;
+                        analysisError = null;
+                        localStorage.removeItem(CACHE_KEY);
+                    }}
+                    onRestart={startGame}
+                />
+            </div>
+        {/if}
+    </div>
 </div>
 
 <style lang="scss">
@@ -802,6 +808,34 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+    }
+
+    .game-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        > div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    .canvas-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
     }
 
     .game-canvas {
