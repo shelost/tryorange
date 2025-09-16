@@ -39,6 +39,11 @@
     let mouseControlEnabled = true;
     let showMouseIndicator = false;
     
+    // Touch control state
+    let touchActive = false;
+    let touchSide = null; // 'left' or 'right'
+    let touchStartTime = 0;
+    
     // Check if device supports hover (desktop)
     let isDesktop = false;
     
@@ -332,6 +337,8 @@
         keys = {};
         mouseControlEnabled = true;
         showMouseIndicator = false;
+        touchActive = false;
+        touchSide = null;
         
         // Reset analysis state
         analysisResult = null;
@@ -409,7 +416,15 @@
         if (!isMobile && mouseControlEnabled) {
             // Mouse control for desktop
             paddle.x = mouseX - paddle.width / 2;
-        } else if (!isMobile || !mouseControlEnabled) {
+        } else if (isMobile && touchActive) {
+            // Touch control for mobile - continuous movement
+            const moveSpeed = paddle.speed; // Smooth, fast movement
+            if (touchSide === 'left') {
+                paddle.x -= moveSpeed;
+            } else if (touchSide === 'right') {
+                paddle.x += moveSpeed;
+            }
+        } else {
             // Keyboard control (desktop and mobile fallback)
             if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
                 paddle.x -= paddle.speed;
@@ -418,7 +433,6 @@
                 paddle.x += paddle.speed;
             }
         }
-        // Mobile touch control is handled in handleCanvasClick/handleCanvasTouch
         
         // Keep paddle within bounds
         paddle.x = Math.max(0, Math.min(canvasWidth - paddle.width, paddle.x));
@@ -693,67 +707,54 @@
         showMouseIndicator = false;
     }
 
-    function handleCanvasClick(e) {
-        if (!started || !isMobile) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const canvasCenterX = canvasWidth / 2;
-        
-        // Move paddle based on which half of the screen was tapped
-        const targetX = clickX < canvasCenterX ? 
-            paddle.width / 2 : // Left side - move to left edge
-            canvasWidth - paddle.width / 2; // Right side - move to right edge
-            
-        // Smooth movement toward target
-        const moveSpeed = paddle.speed * 2; // Faster movement for touch
-        const currentCenterX = paddle.x + paddle.width / 2;
-        
-        if (Math.abs(targetX - currentCenterX) > moveSpeed) {
-            if (targetX > currentCenterX) {
-                paddle.x += moveSpeed;
-            } else {
-                paddle.x -= moveSpeed;
-            }
-        } else {
-            paddle.x = targetX - paddle.width / 2;
-        }
-        
-        // Keep paddle within bounds
-        paddle.x = Math.max(0, Math.min(canvasWidth - paddle.width, paddle.x));
-        
-        logAction('mobile_tap', {
-            clickX,
-            paddleX: paddle.x,
-            side: clickX < canvasCenterX ? 'left' : 'right',
-            time: gameTime
-        });
-    }
-
-    function handleCanvasTouch(e) {
+    function handleTouchStart(e) {
         e.preventDefault(); // Prevent scrolling
         if (!started || !isMobile) return;
         
-        const touch = e.touches[0] || e.changedTouches[0];
+        const touch = e.touches[0];
         if (!touch) return;
         
         const rect = canvas.getBoundingClientRect();
         const touchX = touch.clientX - rect.left;
         const canvasCenterX = canvasWidth / 2;
         
-        // Determine target position based on touch side
-        if (touchX < canvasCenterX) {
-            // Left side - move paddle left
-            paddle.x = Math.max(0, paddle.x - paddle.speed * 3);
-        } else {
-            // Right side - move paddle right
-            paddle.x = Math.min(canvasWidth - paddle.width, paddle.x + paddle.speed * 3);
-        }
+        // Determine which side was touched
+        touchActive = true;
+        touchSide = touchX < canvasCenterX ? 'left' : 'right';
+        touchStartTime = Date.now();
         
-        logAction('mobile_touch', {
+        logAction('touch_start', {
             touchX,
-            paddleX: paddle.x,
-            side: touchX < canvasCenterX ? 'left' : 'right',
+            side: touchSide,
+            time: gameTime
+        });
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault(); // Prevent scrolling
+        if (!started || !isMobile || !touchActive) return;
+        
+        const touch = e.touches[0];
+        if (!touch) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const canvasCenterX = canvasWidth / 2;
+        
+        // Update touch side based on current position
+        touchSide = touchX < canvasCenterX ? 'left' : 'right';
+    }
+
+    function handleTouchEnd(e) {
+        e.preventDefault();
+        if (!started || !isMobile) return;
+        
+        touchActive = false;
+        touchSide = null;
+        
+        const touchDuration = Date.now() - touchStartTime;
+        logAction('touch_end', {
+            duration: touchDuration,
             time: gameTime
         });
     }
@@ -783,6 +784,8 @@
         keys = {};
         mouseControlEnabled = true;
         showMouseIndicator = false;
+        touchActive = false;
+        touchSide = null;
         
         // Clear canvas
         if (ctx && canvas) {
@@ -901,9 +904,10 @@
                 <canvas
                     bind:this={canvas}
                     class="game-canvas"
-                    on:click={handleCanvasClick}
-                    on:touchstart={handleCanvasTouch}
-                    on:touchmove={handleCanvasTouch}
+                    on:touchstart={handleTouchStart}
+                    on:touchmove={handleTouchMove}
+                    on:touchend={handleTouchEnd}
+                    on:touchcancel={handleTouchEnd}
                 ></canvas>
                 <button class="exit-button" type="button" on:click={exitGame} aria-label="Exit game" in:scale={{ duration: 140 }}>
                     Exit
@@ -1031,8 +1035,7 @@
         font-size: 14px;
         
         @media (max-width: 768px) {
-            top: 10px;
-            left: 10px;
+
             padding: 8px 12px;
             font-size: 12px;
         }
