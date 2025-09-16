@@ -66,13 +66,22 @@
 
 <style lang="scss">
     .results {
-        max-width: 850px;
+        width: 850px;
+        max-width: 80dvw;
+      
         margin: 32px auto;
         padding: 0 16px;
+        
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         gap: 16px;
+
+        @media (max-width: 768px) {
+            padding-bottom: 60px;
+        }
+
 
         .title {
             font-size: 28px;
@@ -93,7 +102,10 @@
             align-items: center;
 
             @media (max-width: 768px) {
-                grid-template-columns: 1fr;
+                flex-direction: column;
+                justify-content: flex-start;
+                width: 100%;
+                gap: 0;
             }
         }
 
@@ -164,6 +176,11 @@
             
             &:hover {
                 opacity: 0.8;
+            }
+
+            @media (max-width: 768px) {
+                width: 80dvw;
+                padding: 16px;
             }
         }
 

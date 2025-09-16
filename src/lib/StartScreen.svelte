@@ -28,7 +28,7 @@
                     { color: 'yellow', text: 'Random (-5 to +10)' }
                 ]
             },
-            { text: 'Move your mouse to control the paddle • Arrow keys also work' }
+            { text: 'Desktop: Mouse control • Mobile: Tap left/right sides • Arrow keys work too' }
         ];
     }
 </script>
@@ -89,6 +89,7 @@
 </section>
 
 <style lang="scss">
+    
     .config {
         max-width: 720px;
         margin: 48px auto;

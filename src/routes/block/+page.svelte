@@ -57,13 +57,21 @@
 
     // Canvas scaling for high resolution
     const SCALE_FACTOR = 2;
+    
+    // Responsive sizing variables
+    let isMobile = false;
+    let screenWidth = 0;
+    let responsiveScale = 1;
 
-    // Pellet types
-    const PELLET_TYPES = {
+    // Base pellet types (desktop sizes)
+    const BASE_PELLET_TYPES = {
         GREEN: { color: '#22c55e', points: 3, radius: 18, displayText: '+3' },
         RED: { color: '#ef4444', points: -2, radius: 16, displayText: '-2' },
         YELLOW: { color: '#eab308', points: () => Math.floor(Math.random() * 16) - 5, radius: 20, displayText: '?' }
     };
+
+    // Responsive pellet types (will be calculated based on screen size)
+    let PELLET_TYPES = { ...BASE_PELLET_TYPES };
 
     // Paddle class for pill-shaped paddles
     class Paddle {
@@ -99,7 +107,7 @@
         }
     }
 
-    // Initialize paddle after class definition
+    // Initialize paddle after class definition (will be resized responsively)
     paddle = new Paddle(0, 0, 120, 20);
 
     // Pellet class for consistent state management
@@ -182,8 +190,52 @@
         }
     }
 
+    function updateResponsiveSettings() {
+        screenWidth = window.innerWidth;
+        isMobile = screenWidth < 768;
+        
+        // Calculate responsive scale (mobile gets smaller elements)
+        if (isMobile) {
+            responsiveScale = Math.max(0.6, screenWidth / 1200); // 60% minimum, scales up to desktop
+        } else {
+            responsiveScale = 1; // Full size for desktop
+        }
+        
+        // Update pellet types with responsive sizing
+        PELLET_TYPES = {
+            GREEN: { 
+                ...BASE_PELLET_TYPES.GREEN, 
+                radius: Math.round(BASE_PELLET_TYPES.GREEN.radius * responsiveScale) 
+            },
+            RED: { 
+                ...BASE_PELLET_TYPES.RED, 
+                radius: Math.round(BASE_PELLET_TYPES.RED.radius * responsiveScale) 
+            },
+            YELLOW: { 
+                ...BASE_PELLET_TYPES.YELLOW, 
+                radius: Math.round(BASE_PELLET_TYPES.YELLOW.radius * responsiveScale) 
+            }
+        };
+        
+        // Update paddle size
+        const basePaddleWidth = 120;
+        const basePaddleHeight = 20;
+        paddle.width = Math.round(basePaddleWidth * responsiveScale);
+        paddle.height = Math.round(basePaddleHeight * responsiveScale);
+        
+        // Adjust pellet spawn rate for mobile (fewer pellets on smaller screens)
+        if (isMobile) {
+            pelletSpawnRate = 0.10; // Slightly reduced for mobile
+        } else {
+            pelletSpawnRate = 0.15; // Full rate for desktop
+        }
+    }
+
     function initCanvas() {
         if (!canvas) return;
+        
+        // Update responsive settings first
+        updateResponsiveSettings();
         
         // Clear any existing canvas content
         if (ctx) {
@@ -221,6 +273,9 @@
 
     function resizeCanvas() {
         if (!canvas) return;
+        
+        // Update responsive settings when canvas resizes
+        updateResponsiveSettings();
         
         // Logical dimensions
         canvasWidth = window.innerWidth;
@@ -351,11 +406,11 @@
     }
 
     function updatePaddle() {
-        if (mouseControlEnabled) {
-            // Mouse control
+        if (!isMobile && mouseControlEnabled) {
+            // Mouse control for desktop
             paddle.x = mouseX - paddle.width / 2;
-        } else {
-            // Keyboard control
+        } else if (!isMobile || !mouseControlEnabled) {
+            // Keyboard control (desktop and mobile fallback)
             if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
                 paddle.x -= paddle.speed;
             }
@@ -363,6 +418,7 @@
                 paddle.x += paddle.speed;
             }
         }
+        // Mobile touch control is handled in handleCanvasClick/handleCanvasTouch
         
         // Keep paddle within bounds
         paddle.x = Math.max(0, Math.min(canvasWidth - paddle.width, paddle.x));
@@ -536,13 +592,20 @@
         // Instructions (first few seconds)
         if (gameTime < 3) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.font = '18px Inter';
+            ctx.font = `${Math.round(18 * responsiveScale)}px Inter`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const instructionText = isDesktop ? 
-                'Follow the shadow paddle with your mouse • Catch pellets for points!' : 
-                'Move mouse to control paddle • Catch pellets for points!';
-            ctx.fillText(instructionText, canvasWidth / 2, canvasHeight / 2 + 100);
+            
+            let instructionText;
+            if (isMobile) {
+                instructionText = 'Tap left/right sides of screen to move paddle!';
+            } else if (isDesktop) {
+                instructionText = 'Follow the shadow paddle with your mouse • Catch pellets for points!';
+            } else {
+                instructionText = 'Move mouse to control paddle • Catch pellets for points!';
+            }
+            
+            ctx.fillText(instructionText, canvasWidth / 2, canvasHeight / 2 + (100 * responsiveScale));
         }
     }
 
@@ -607,7 +670,7 @@
             mouseX = e.clientX - rect.left;
             mouseY = e.clientY - rect.top;
             
-            if (started) {
+            if (started && !isMobile) {
                 mouseControlEnabled = true;
                 showMouseIndicator = true;
             }
@@ -622,6 +685,71 @@
 
     function handleMouseLeave() {
         showMouseIndicator = false;
+    }
+
+    function handleCanvasClick(e) {
+        if (!started || !isMobile) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const canvasCenterX = canvasWidth / 2;
+        
+        // Move paddle based on which half of the screen was tapped
+        const targetX = clickX < canvasCenterX ? 
+            paddle.width / 2 : // Left side - move to left edge
+            canvasWidth - paddle.width / 2; // Right side - move to right edge
+            
+        // Smooth movement toward target
+        const moveSpeed = paddle.speed * 2; // Faster movement for touch
+        const currentCenterX = paddle.x + paddle.width / 2;
+        
+        if (Math.abs(targetX - currentCenterX) > moveSpeed) {
+            if (targetX > currentCenterX) {
+                paddle.x += moveSpeed;
+            } else {
+                paddle.x -= moveSpeed;
+            }
+        } else {
+            paddle.x = targetX - paddle.width / 2;
+        }
+        
+        // Keep paddle within bounds
+        paddle.x = Math.max(0, Math.min(canvasWidth - paddle.width, paddle.x));
+        
+        logAction('mobile_tap', {
+            clickX,
+            paddleX: paddle.x,
+            side: clickX < canvasCenterX ? 'left' : 'right',
+            time: gameTime
+        });
+    }
+
+    function handleCanvasTouch(e) {
+        e.preventDefault(); // Prevent scrolling
+        if (!started || !isMobile) return;
+        
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const canvasCenterX = canvasWidth / 2;
+        
+        // Determine target position based on touch side
+        if (touchX < canvasCenterX) {
+            // Left side - move paddle left
+            paddle.x = Math.max(0, paddle.x - paddle.speed * 3);
+        } else {
+            // Right side - move paddle right
+            paddle.x = Math.min(canvasWidth - paddle.width, paddle.x + paddle.speed * 3);
+        }
+        
+        logAction('mobile_touch', {
+            touchX,
+            paddleX: paddle.x,
+            side: touchX < canvasCenterX ? 'left' : 'right',
+            time: gameTime
+        });
     }
 
     function exitGame() {
@@ -767,6 +895,9 @@
                 <canvas
                     bind:this={canvas}
                     class="game-canvas"
+                    on:click={handleCanvasClick}
+                    on:touchstart={handleCanvasTouch}
+                    on:touchmove={handleCanvasTouch}
                 ></canvas>
                 <button class="exit-button" type="button" on:click={exitGame} aria-label="Exit game" in:scale={{ duration: 140 }}>
                     Exit
@@ -775,7 +906,7 @@
         {/if}
 
         {#if finished}
-            <div in:fade={{ duration: 300, delay: 200 }} out:fade={{ duration: 200 }}>
+            <div class = 'results-container' in:fade={{ duration: 300, delay: 200 }} out:fade={{ duration: 200 }}>
                 <ResultsScreen
                     title="Game Complete!"
                     gameType="block"
@@ -798,8 +929,9 @@
 </div>
 
 <style lang="scss">
+    
     .app {
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-family: 'Inter', sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -808,18 +940,21 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+        overflow-y: scroll;
     }
 
     .game-container {
         position: relative;
         width: 100%;
-        height: 100vh;
+        height: fit-content;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        
-        > div {
+
+    
+        div {
             position: absolute;
             top: 0;
             left: 0;
@@ -829,6 +964,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+
+            @media screen and (max-width: 768px) {
+                align-items: flex-start;
+                justify-content: flex-start;
+            }
         }
     }
 

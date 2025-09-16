@@ -29,7 +29,7 @@ Address the user in the second-person POV "you" in the analysis. Use appropriate
 Please provide the analysis as a JSON object with two properties:
 - "summary": A single paragraph of general analysis (no scores mentioned in the text)
 - "scores": An array of exactly 5 numbers (0-10) in the order listed above
-
+gi
 Be insightful but also responsible. Do not make medical diagnoses.
 
 Example output format:
