@@ -6,7 +6,7 @@
     import ResultsScreen from '$lib/ResultsScreen.svelte';
 
     // Game configuration
-    let selectedDuration = 20; // 20, 40, 60 seconds
+    let selectedDuration = 30; // 20, 40, 60 seconds
     
     // Game state
     let started = false;
@@ -580,14 +580,20 @@
         ctx.shadowOffsetY = 0;
     }
 
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
     function drawUI() {
         // Time remaining (top right)
         const timeLeft = Math.max(0, selectedDuration - gameTime);
         ctx.fillStyle = '#1f2937';
         ctx.font = 'bold 24px Inter';
-        ctx.textAlign = 'right';
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
-        ctx.fillText(`Time: ${Math.ceil(timeLeft)}s`, canvasWidth - 20, 20);
+        ctx.fillText(formatTime(timeLeft), 20, 20);
         
         // Instructions (first few seconds)
         if (gameTime < 3) {
@@ -1011,9 +1017,8 @@
 
     .exit-button {
         position: fixed;
-        left: 50%;
-        bottom: 20px;
-        transform: translateX(-50%);
+        top: 20px;
+        right: 20px;
         padding: 10px 16px;
         border-radius: 999px;
         border: 0;
@@ -1023,5 +1028,13 @@
         cursor: pointer;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 1000;
+        font-size: 14px;
+        
+        @media (max-width: 768px) {
+            top: 10px;
+            left: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
     }
 </style>

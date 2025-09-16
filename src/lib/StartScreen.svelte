@@ -10,7 +10,7 @@
     export let timePerWordMs = 6000;
     
     // Block game options  
-    export let selectedDuration = 20;
+    export let selectedDuration = 30;
     
     // Game-specific instructions
     let instructions = [];
@@ -75,9 +75,9 @@
             <label class="control">
                 <span>Game Duration</span>
                 <div class="options">
-                    <button class:selected={selectedDuration === 20} on:click={() => (selectedDuration = 20)}>20s</button>
-                    <button class:selected={selectedDuration === 40} on:click={() => (selectedDuration = 40)}>40s</button>
+                    <button class:selected={selectedDuration === 30} on:click={() => (selectedDuration = 30)}>30s</button>
                     <button class:selected={selectedDuration === 60} on:click={() => (selectedDuration = 60)}>60s</button>
+                    <button class:selected={selectedDuration === 90} on:click={() => (selectedDuration = 90)}>90s</button>
                 </div>
             </label>
         {/if}
@@ -94,10 +94,12 @@
         max-width: 720px;
         margin: 48px auto;
         padding: 0 16px;
+        height: 90dvh;
         display: flex;
         flex-direction: column;
         gap: 24px;
         align-items: center;
+        justify-content: center;
     }
 
     .mast {
