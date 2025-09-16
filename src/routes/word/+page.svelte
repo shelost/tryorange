@@ -296,12 +296,12 @@
 <style lang="scss">
 
     .app{
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-family: 'Inter', sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 90dvh;
+       // height: 90dvh;
     }
 
     .game-container {
@@ -435,8 +435,18 @@
     }
 
     .exit-button {
-        position: fixed; right: 20px; top: 20px;
-        padding: 10px 16px; border-radius: 999px; border: 0; background: #ef4444; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 0;
+        background: #ef4444;
+        color: white;
+        font-weight: 700;
+        cursor: pointer; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+    
 </style>
 

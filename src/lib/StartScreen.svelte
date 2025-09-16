@@ -28,7 +28,7 @@
                     { color: 'yellow', text: 'Random (-5 to +10)' }
                 ]
             },
-            { text: 'Desktop: Mouse control • Mobile: Tap left/right sides • Arrow keys work too' }
+            { text: '' }
         ];
     }
 </script>
